@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Wonderful Names of Our Wonderful Lord</string>
-    <string name="hello_world">Hello World!</string>
+    <string name="curtain_title_the">The</string>
+    <string name="curtain_title_wonderful">WONDERFUL</string>
+    <string name="curtain_title_names">NAMES</string>
+    <string name="curtain_title_of">of</string>
+    <string name="curtain_title_our">OUR</string>
+    <string name="curtain_title_lord">LORD</string>
+    <string name="curtain_author">by\nCharles Hurlburt\nand\nT.C. Horton</string>
 </resources>
