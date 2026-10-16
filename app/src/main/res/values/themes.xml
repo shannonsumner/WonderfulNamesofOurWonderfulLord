@@ -8,6 +8,6 @@
     <style name="Theme.WonderfulNamesOfOurWonderfulLord" parent="Base.Theme.WonderfulNamesOfOurWonderfulLord" />
 
     <style name="Theme.WonderfulNamesOfOurWonderfulLord.Splash" parent="Theme.WonderfulNamesOfOurWonderfulLord">
-        <item name="android:windowBackground">@color/curtain_background</item>
+        <item name="android:windowBackground">@drawable/curtain_splash_screen</item>
     </style>
 </resources>

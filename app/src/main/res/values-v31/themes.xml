@@ -1,6 +1,6 @@
 <resources>
     <style name="Theme.WonderfulNamesOfOurWonderfulLord.Splash" parent="Theme.WonderfulNamesOfOurWonderfulLord">
         <item name="android:windowSplashScreenBackground">@color/curtain_background</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/curtain_splash_mark</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
     </style>
 </resources>
