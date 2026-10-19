@@ -38,10 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun CurtainScreen() {
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+fun CurtainScreen(modifier: Modifier = Modifier) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val layout = curtainLayoutForWindow(maxWidth, maxHeight)
-        CurtainBackground(layout)
+        StripedBackground(layout)
         Image(
             painter = painterResource(R.drawable.curtain_background),
             contentDescription = null,
@@ -137,8 +137,9 @@ private fun CursiveTitleLine(textRes: Int, layout: CurtainLayout) {
     )
 }
 
+/** The green, vertically striped background shared by the curtain and the daily reading page. */
 @Composable
-private fun CurtainBackground(layout: CurtainLayout) {
+internal fun StripedBackground(layout: CurtainLayout) {
     val backgroundColor = colorResource(R.color.curtain_background)
     Canvas(modifier = Modifier.fillMaxSize()) {
         drawRect(backgroundColor)

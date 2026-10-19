@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    CurtainScreen()
+                    MainScreen()
                 }
             }
         }

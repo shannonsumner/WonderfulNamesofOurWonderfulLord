@@ -1,0 +1,118 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "8b1424c4ab29cfea54c28ffe11296c92",
+    "entities": [
+      {
+        "tableName": "verses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `book` INTEGER NOT NULL, `chapter` INTEGER NOT NULL, `verse` INTEGER NOT NULL, `text` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "book",
+            "columnName": "book",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chapter",
+            "columnName": "chapter",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "verse",
+            "columnName": "verse",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "ixb",
+            "unique": false,
+            "columnNames": [
+              "book"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `ixb` ON `${TABLE_NAME}` (`book`)"
+          },
+          {
+            "name": "ixc",
+            "unique": false,
+            "columnNames": [
+              "chapter"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `ixc` ON `${TABLE_NAME}` (`chapter`)"
+          },
+          {
+            "name": "ixv",
+            "unique": false,
+            "columnNames": [
+              "verse"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `ixv` ON `${TABLE_NAME}` (`verse`)"
+          },
+          {
+            "name": "ixbcv",
+            "unique": false,
+            "columnNames": [
+              "book",
+              "chapter",
+              "verse"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `ixbcv` ON `${TABLE_NAME}` (`book`, `chapter`, `verse`)"
+          }
+        ]
+      },
+      {
+        "tableName": "meta",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`field` TEXT NOT NULL, `value` TEXT, PRIMARY KEY(`field`))",
+        "fields": [
+          {
+            "fieldPath": "field",
+            "columnName": "field",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "field"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8b1424c4ab29cfea54c28ffe11296c92')"
+    ]
+  }
+}

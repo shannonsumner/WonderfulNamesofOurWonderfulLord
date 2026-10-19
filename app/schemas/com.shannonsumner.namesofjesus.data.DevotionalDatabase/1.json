@@ -1,0 +1,75 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "f7c71f01cd7968ab18d573c8a9d8ce1e",
+    "entities": [
+      {
+        "tableName": "Daily",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`day_of_year` INTEGER NOT NULL, `topic` TEXT NOT NULL, `scripture` TEXT NOT NULL, `reference` TEXT NOT NULL, `book` INTEGER, `chapter` INTEGER, `verse` TEXT NOT NULL, `devo` TEXT, `activity` TEXT, PRIMARY KEY(`day_of_year`))",
+        "fields": [
+          {
+            "fieldPath": "dayOfYear",
+            "columnName": "day_of_year",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "topic",
+            "columnName": "topic",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scripture",
+            "columnName": "scripture",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "book",
+            "columnName": "book",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "chapter",
+            "columnName": "chapter",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "verse",
+            "columnName": "verse",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "devo",
+            "columnName": "devo",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "activity",
+            "columnName": "activity",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "day_of_year"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f7c71f01cd7968ab18d573c8a9d8ce1e')"
+    ]
+  }
+}
