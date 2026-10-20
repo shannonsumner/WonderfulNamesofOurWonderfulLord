@@ -7,4 +7,20 @@
     <string name="curtain_title_our">OUR</string>
     <string name="curtain_title_lord">LORD</string>
     <string name="curtain_author">by\nCharles Hurlburt\nand\nT.C. Horton</string>
+    <string name="date_nav_previous_day">Previous Day</string>
+    <string name="date_nav_next_day">Next Day</string>
+    <string name="date_nav_choose_date">Choose date</string>
+    <string name="date_nav_choose_month_and_day">Choose month and day</string>
+    <string name="date_nav_previous_month">Previous month</string>
+    <string name="date_nav_next_month">Next month</string>
+    <string name="date_nav_day_description">%1$s %2$d</string>
+    <string-array name="date_nav_weekday_labels">
+        <item>Su</item>
+        <item>Mo</item>
+        <item>Tu</item>
+        <item>We</item>
+        <item>Th</item>
+        <item>Fr</item>
+        <item>Sa</item>
+    </string-array>
 </resources>

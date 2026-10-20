@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,13 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -22,14 +30,18 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import java.time.LocalDate
 
 // Values match the companion site's DailyReading.css.
 private val PanelMaxWidth = 960.dp
 private val PanelCornerRadius = 6.dp
-private val PanelColor = Color(red = 245, green = 247, blue = 235, alpha = 191) // 75% opacity
 private val PanelShadowElevation = 16.dp
 // Android lowers shadow opacity on its own, so full black ends up close to the site's 22%.
 private val PanelShadowColor = Color.Black
@@ -41,6 +53,7 @@ private fun outerPaddingForWidth(width: Dp): Dp = if (width <= 1024.dp) 24.dp el
 @Composable
 fun DailyReadingPanel(modifier: Modifier = Modifier) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val isCompact = maxWidth <= 600.dp
         StripedBackground(curtainLayoutForWidth(maxWidth))
         Box(
             contentAlignment = Alignment.TopCenter,
@@ -49,14 +62,40 @@ fun DailyReadingPanel(modifier: Modifier = Modifier) {
                 .windowInsetsPadding(WindowInsets.safeDrawing) // keep clear of status/navigation bars
                 .padding(outerPaddingForWidth(maxWidth))
         ) {
-            ReadingPanel()
+            ReadingPanel(isCompact = isCompact)
         }
     }
 }
 
 /** The rounded, translucent card that will hold the day's reading. */
 @Composable
-private fun ReadingPanel() {
+private fun ReadingPanel(isCompact: Boolean) {
+    var today by remember { mutableStateOf(LocalDate.now()) }
+    var selectedDateEpochDay by rememberSaveable {
+        mutableLongStateOf(today.toEpochDay())
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        fun refreshDate() {
+            today = LocalDate.now()
+            if (selectedDateEpochDay != today.toEpochDay()) {
+                selectedDateEpochDay = today.toEpochDay()
+            }
+        }
+
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                refreshDate()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+    val selectedDate = remember(selectedDateEpochDay) {
+        LocalDate.ofEpochDay(selectedDateEpochDay)
+    }
     val shape = RoundedCornerShape(PanelCornerRadius)
     Box(
         modifier = Modifier
@@ -67,8 +106,16 @@ private fun ReadingPanel() {
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .background(PanelColor, shape)
+                .background(colorResource(R.color.daily_reading_panel), shape)
         )
+        Column(modifier = Modifier.fillMaxSize()) {
+            DateNav(
+                date = selectedDate,
+                onDateChange = { selectedDateEpochDay = it.toEpochDay() },
+                isCompact = isCompact,
+                today = today
+            )
+        }
     }
 }
 
