@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Used by the XML splash screen and launcher icon. Compose colors live in
+         ui/theme/Color.kt; keep CurtainGreen there in sync with this value. -->
     <color name="curtain_background">#FFB4D77D</color>
-    <color name="daily_reading_panel">#BFF5F7EB</color>
-    <color name="date_nav_accent">#FF1F6F52</color>
-    <color name="date_nav_selected_day">#FFF5F7EB</color>
-    <color name="date_nav_divider">#1A000000</color>
 </resources>

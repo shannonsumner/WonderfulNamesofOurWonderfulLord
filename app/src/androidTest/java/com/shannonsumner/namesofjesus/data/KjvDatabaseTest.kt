@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -28,7 +28,13 @@ class KjvDatabaseTest {
             try {
                 val dao = database.bibleDao()
                 assertEquals(31102, dao.getVerseCount())
-                val actualMetadata = dao.getMetadata().associate { it.field to it.value }
+                val actualMetadata = database.query("SELECT field, value FROM meta", null).use { cursor ->
+                    buildMap {
+                        while (cursor.moveToNext()) {
+                            put(cursor.getString(0), if (cursor.isNull(1)) null else cursor.getString(1))
+                        }
+                    }
+                }
                 val metadata = context.assets.open("databases/kjv-metadata.json")
                     .bufferedReader(Charsets.UTF_8)
                     .use { JSONArray(it.readText()) }
@@ -39,42 +45,35 @@ class KjvDatabaseTest {
                     assertEquals(value, actualMetadata[entry.getString("field")])
                 }
 
-                var chapterKey: Pair<Int, Int>? = null
-                var chapterVerses = emptyList<BibleVerse>()
-                context.assets.open("databases/kjv-verses.jsonl")
+                val expectedByChapter = context.assets.open("databases/kjv-verses.jsonl")
                     .bufferedReader(Charsets.UTF_8)
                     .useLines { lines ->
-                        lines.forEach { line ->
+                        lines.map { line ->
                             val row = JSONObject(line)
-                            val expected = BibleVerse(
+                            BibleVerse(
                                 row.getInt("id"),
                                 row.getInt("book"),
                                 row.getInt("chapter"),
                                 row.getInt("verse"),
                                 row.getString("text")
                             )
-                            val key = expected.book to expected.chapter
-                            if (key != chapterKey) {
-                                chapterVerses = dao.getChapter(expected.book, expected.chapter)
-                                chapterKey = key
-                            }
-                            assertEquals(expected, chapterVerses.single { it.verse == expected.verse })
-                        }
+                        }.groupBy { it.book to it.chapter }
                     }
-                assertEquals(
-                    dao.getChapter(1, 1).filter { it.verse in 1..3 },
-                    dao.getPassage(1, 1, 1, 3)
-                )
-                assertEquals(1, dao.getVerse(1, 1, 1)?.id)
-                assertEquals(31102, dao.getVerse(66, 22, 21)?.id)
-                assertNull(dao.getVerse(1, 1, 0))
+                expectedByChapter.forEach { (key, expected) ->
+                    val (book, chapter) = key
+                    val actual = dao.getVerses(book, chapter, expected.map { it.verse })
+                    assertEquals(expected.sortedBy { it.verse }, actual.sortedBy { it.verse })
+                }
+                assertEquals(listOf(1), dao.getVerses(1, 1, listOf(1)).map { it.id })
+                assertEquals(listOf(31102), dao.getVerses(66, 22, listOf(21)).map { it.id })
+                assertTrue(dao.getVerses(1, 1, listOf(0)).isEmpty())
             } finally {
                 database.close()
             }
             val reopened = openDatabase()
             try {
                 assertEquals(31102, reopened.bibleDao().getVerseCount())
-                assertEquals(31102, reopened.bibleDao().getVerse(66, 22, 21)?.id)
+                assertEquals(31102, reopened.bibleDao().getVerses(66, 22, listOf(21)).single().id)
             } finally {
                 reopened.close()
             }

@@ -1,4 +1,4 @@
-package com.shannonsumner.namesofjesus
+package com.shannonsumner.namesofjesus.ui.curtain
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,8 +47,6 @@ class CurtainLayoutTest {
             assertEquals(28.sp, layout.authorFontSize)
             assertEquals(1.92.sp, layout.titleLetterSpacing)
             assertEquals(24.dp, layout.titleAuthorGap)
-            assertEquals(14.dp, layout.stripeStart)
-            assertEquals(24.dp, layout.stripeEnd)
             assertFalse(layout.centerContent)
             assertEquals((width * 0.72f).value, layout.artworkWidth(width).value, 0.001f)
         }
@@ -62,8 +60,6 @@ class CurtainLayoutTest {
             assertEquals(38.sp, layout.authorFontSize)
             assertEquals(4.sp, layout.titleLetterSpacing)
             assertEquals(32.dp, layout.titleAuthorGap)
-            assertEquals(20.dp, layout.stripeStart)
-            assertEquals(34.dp, layout.stripeEnd)
             assertFalse(layout.centerContent)
             assertEquals((width * 0.42f).value, layout.artworkWidth(width).value, 0.001f)
         }
@@ -77,8 +73,6 @@ class CurtainLayoutTest {
             assertEquals(48.sp, layout.authorFontSize)
             assertEquals(6.4.sp, layout.titleLetterSpacing)
             assertEquals(48.dp, layout.titleAuthorGap)
-            assertEquals(30.dp, layout.stripeStart)
-            assertEquals(50.dp, layout.stripeEnd)
             assertTrue(layout.centerContent)
             assertEquals(
                 minOf(468.dp, width * 0.42f).value,

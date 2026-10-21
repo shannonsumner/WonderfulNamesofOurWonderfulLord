@@ -1,6 +1,5 @@
-package com.shannonsumner.namesofjesus
+package com.shannonsumner.namesofjesus.ui.datenav
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +11,7 @@ import androidx.compose.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
+import com.shannonsumner.namesofjesus.ui.theme.WonderfulNamesTheme
 
 class DateNavTest {
     @get:Rule
@@ -21,7 +21,7 @@ class DateNavTest {
     fun previousAndNextButtonsNavigateAcrossMonthBoundary() {
         var date by mutableStateOf(LocalDate.of(2024, 1, 1))
         compose.setContent {
-            MaterialTheme {
+            WonderfulNamesTheme {
                 DateNav(
                     date = date,
                     onDateChange = { date = it },
@@ -44,7 +44,7 @@ class DateNavTest {
     fun calendarSelectsDayAndDoesNotDisplayYear() {
         var date by mutableStateOf(LocalDate.of(2024, 1, 31))
         compose.setContent {
-            MaterialTheme {
+            WonderfulNamesTheme {
                 DateNav(
                     date = date,
                     onDateChange = { date = it },

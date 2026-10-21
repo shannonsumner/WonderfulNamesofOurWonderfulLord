@@ -1,25 +1,32 @@
-package com.shannonsumner.namesofjesus
+package com.shannonsumner.namesofjesus.ui.dailyreading
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.shannonsumner.namesofjesus.HiltTestActivity
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
+import com.shannonsumner.namesofjesus.ui.theme.WonderfulNamesTheme
 
+@HiltAndroidTest
 class DailyReadingPanelTest {
-    @get:Rule
-    val compose = createComposeRule()
+    @get:Rule(order = 0)
+    val hilt = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val compose = createAndroidComposeRule<HiltTestActivity>()
 
     @Test
     fun resumingResetsManuallySelectedDateToToday() {
@@ -31,7 +38,7 @@ class DailyReadingPanelTest {
         }
         compose.setContent {
             CompositionLocalProvider(LocalLifecycleOwner provides owner) {
-                MaterialTheme {
+                WonderfulNamesTheme {
                     DailyReadingPanel()
                 }
             }

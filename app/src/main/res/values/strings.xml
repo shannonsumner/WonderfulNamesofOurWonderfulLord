@@ -14,6 +14,9 @@
     <string name="date_nav_previous_month">Previous month</string>
     <string name="date_nav_next_month">Next month</string>
     <string name="date_nav_day_description">%1$s %2$d</string>
+    <string name="daily_reading_open_scripture">Read %1$s</string>
+    <string name="scripture_close">Close</string>
+    <string name="scripture_unavailable">This passage couldn’t be loaded.</string>
     <string-array name="date_nav_weekday_labels">
         <item>Su</item>
         <item>Mo</item>

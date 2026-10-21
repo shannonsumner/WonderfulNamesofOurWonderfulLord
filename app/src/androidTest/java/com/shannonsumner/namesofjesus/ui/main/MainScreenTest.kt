@@ -1,23 +1,30 @@
-package com.shannonsumner.namesofjesus
+package com.shannonsumner.namesofjesus.ui.main
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.shannonsumner.namesofjesus.HiltTestActivity
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import androidx.compose.ui.test.onAllNodesWithText
 import org.junit.Rule
 import org.junit.Test
+import com.shannonsumner.namesofjesus.ui.theme.WonderfulNamesTheme
 
+@HiltAndroidTest
 class MainScreenTest {
-    @get:Rule
-    val compose = createComposeRule()
+    @get:Rule(order = 0)
+    val hilt = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val compose = createAndroidComposeRule<HiltTestActivity>()
 
     @Test
     fun curtainWaitsThenRaisesAndStaysDismissedAfterRestoration() {
         compose.mainClock.autoAdvance = false
         val restoration = StateRestorationTester(compose)
         restoration.setContent {
-            MaterialTheme {
+            WonderfulNamesTheme {
                 MainScreen()
             }
         }

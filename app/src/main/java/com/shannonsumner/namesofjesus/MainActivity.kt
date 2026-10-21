@@ -6,10 +6,14 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.shannonsumner.namesofjesus.ui.main.MainScreen
+import dagger.hilt.android.AndroidEntryPoint
+import com.shannonsumner.namesofjesus.ui.theme.WonderfulNamesTheme
 
+/** The app's only screen. `@AndroidEntryPoint` lets its composables get ViewModels from Hilt. */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +28,7 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            MaterialTheme {
+            WonderfulNamesTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MainScreen()
                 }

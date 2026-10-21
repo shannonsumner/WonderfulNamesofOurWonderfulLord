@@ -2,7 +2,6 @@ package com.shannonsumner.namesofjesus.data
 
 import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import org.json.JSONArray
@@ -17,20 +16,8 @@ abstract class KjvDatabase : RoomDatabase() {
     abstract fun bibleDao(): BibleDao
 
     companion object {
-        @Volatile
-        private var instance: KjvDatabase? = null
-
-        fun getInstance(context: Context): KjvDatabase =
-            instance ?: synchronized(this) {
-                instance ?: Room.databaseBuilder(
-                    context.applicationContext,
-                    KjvDatabase::class.java,
-                    "kjv.sqlite"
-                )
-                    .addCallback(seedCallback(context.applicationContext))
-                    .build()
-                    .also { instance = it }
-            }
+        /** The database file name in the app's private storage. */
+        const val FILE_NAME = "kjv.sqlite"
 
         internal fun seedCallback(context: Context): Callback = object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {

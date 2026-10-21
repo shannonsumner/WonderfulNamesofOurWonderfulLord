@@ -2,7 +2,6 @@ package com.shannonsumner.namesofjesus.data
 
 import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import org.json.JSONArray
@@ -12,20 +11,8 @@ abstract class DevotionalDatabase : RoomDatabase() {
     abstract fun dailyDevotionalDao(): DailyDevotionalDao
 
     companion object {
-        @Volatile
-        private var instance: DevotionalDatabase? = null
-
-        fun getInstance(context: Context): DevotionalDatabase =
-            instance ?: synchronized(this) {
-                instance ?: Room.databaseBuilder(
-                    context.applicationContext,
-                    DevotionalDatabase::class.java,
-                    "daily-devotional.sqlite"
-                )
-                    .addCallback(seedCallback(context.applicationContext))
-                    .build()
-                    .also { instance = it }
-            }
+        /** The database file name in the app's private storage. */
+        const val FILE_NAME = "daily-devotional.sqlite"
 
         internal fun seedCallback(context: Context): Callback = object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
