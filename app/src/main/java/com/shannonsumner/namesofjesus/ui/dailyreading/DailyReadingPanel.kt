@@ -2,6 +2,7 @@ package com.shannonsumner.namesofjesus.ui.dailyreading
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -16,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,14 +31,24 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.addOutline
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.shannonsumner.namesofjesus.R
 import com.shannonsumner.namesofjesus.data.ScriptureSelection
+import com.shannonsumner.namesofjesus.data.toShareText
 import com.shannonsumner.namesofjesus.ui.components.StripedBackground
 import com.shannonsumner.namesofjesus.ui.datenav.DateNav
 import com.shannonsumner.namesofjesus.ui.scripture.ScriptureDialog
+import com.shannonsumner.namesofjesus.ui.share.ShareButtons
+import com.shannonsumner.namesofjesus.ui.share.ShareButtonsStyle
 import com.shannonsumner.namesofjesus.ui.theme.WindowWidth
 import com.shannonsumner.namesofjesus.ui.theme.WonderfulNamesTheme
 import java.time.LocalDate
@@ -70,7 +83,27 @@ internal fun DailyReadingPanel(
     onScriptureDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+    val currentOnDateChange by rememberUpdatedState(onDateChange)
+    val swipeThreshold = with(LocalDensity.current) { 56.dp.toPx() }
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxSize()
+            .pointerInput(uiState.date, swipeThreshold) {
+                var dragDistance = 0f
+                detectHorizontalDragGestures(
+                    onDragStart = { dragDistance = 0f },
+                    onHorizontalDrag = { _, dragAmount -> dragDistance += dragAmount },
+                    onDragEnd = {
+                        when {
+                            dragDistance <= -swipeThreshold ->
+                                currentOnDateChange(uiState.date.plusDays(1))
+                            dragDistance >= swipeThreshold ->
+                                currentOnDateChange(uiState.date.minusDays(1))
+                        }
+                    }
+                )
+            }
+    ) {
         val windowWidth = WindowWidth.of(maxWidth)
         val isCompact = windowWidth == WindowWidth.Phone
         StripedBackground(windowWidth)
@@ -114,8 +147,7 @@ private fun ReadingPanel(
             DateNav(
                 date = uiState.date,
                 onDateChange = onDateChange,
-                isCompact = isCompact,
-                today = uiState.today
+                isCompact = isCompact
             )
             if (devotional != null) {
                 DailyReading(
@@ -125,8 +157,22 @@ private fun ReadingPanel(
                     modifier = Modifier
                         .weight(1f)
                         .verticalScroll(scrollState)
+                        .padding(bottom = ShareButtonsStyle.readingClearance(isCompact))
                 )
             }
+        }
+        if (devotional != null) {
+            val copyrightHtml = stringResource(R.string.copyright_book)
+            val shareText = remember(devotional, copyrightHtml) {
+                devotional.toShareText(copyright = AnnotatedString.fromHtml(copyrightHtml).text)
+            }
+            ShareButtons(
+                shareText = shareText,
+                title = devotional.topic,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(ShareButtonsStyle.edgeOffset(isCompact))
+            )
         }
     }
 }

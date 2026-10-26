@@ -37,10 +37,19 @@ and style objects for appearance):
 | Fonts, sizes, colors, spacing, link styling | `ui/dailyreading/DailyReadingStyle.kt` | `DailyReading.css` |
 | Verse selection parsing and passage lookup | `data/ScriptureRepository.kt` | `lib/kjv.ts`, `/api/scripture` |
 | Scripture popup state, layout, and style | `ui/scripture/ScriptureDialogState.kt`, `ScriptureDialog.kt`, `ScriptureDialogStyle.kt` | `ScriptureModal.tsx`, `Modal.tsx`, CSS |
+| Share text | `data/DevotionalShareText.kt` | `shareText` in `DailyReading.tsx` |
+| Share and copyright buttons, copyright dialog | `ui/share/ShareButtons.kt`, `CopyrightDialog.kt`, `ShareButtonsStyle.kt` | `ShareButtons.tsx`, `CopyrightModal.tsx`, CSS |
 
 **Leap years.** The data has 366 days and no year. Every date is looked up as
 if it were in 2024 (a leap year), so February 29 is always day 60 and March 1
 is always day 61. In common years, the February 29 reading is skipped.
+
+**Date picker.** Tapping the date opens a Material 3 date picker with calendar,
+year selection, and text entry. **OK** applies the selected date; **Cancel** or
+dismissing the dialog leaves the reading unchanged. The selected year controls
+calendar navigation, but devotional lookup still uses its month and day in
+2024. Choose a leap year to access the February 29 reading. The date label
+above the reading continues to omit the year.
 
 **HTML.** Jsoup parses the HTML, decodes entities, and removes disallowed tags
 with a `Safelist`; `DevotionalHtml` then turns the result into styled text.
@@ -53,7 +62,17 @@ Entities such as `&hellip;` are decoded. If a field contains single line breaks
 `white-space: pre-wrap`; otherwise paragraphs are split on blank lines and
 whitespace is collapsed. Scripture buttons become tappable links (for example,
 `data-scripture="50:2:9"` becomes Philippians 2:9). Tapping a link or the main
-scripture opens the scripture popup. Share buttons are not implemented yet.
+scripture opens the scripture popup.
+
+**Share buttons.** Two round buttons float over the panel's lower-right corner
+(16 dp in on phones, 24 dp otherwise) and stay put while the reading scrolls.
+The reading has extra bottom padding so its last line can scroll above them.
+**Share** opens the Android share sheet with the day's reading as plain text
+(HTML removed, entities decoded): topic, main scripture and reference, the
+reading, the prayer, and the book's copyright notice. **Info** opens a dialog
+with the full copyright notice.
+Unlike the website, there is no image or email button; email apps appear in
+the share sheet.
 
 **Scripture popup.** The website's modal is a standard Material `AlertDialog`
 showing the reference and each KJV verse with a superscript verse number. Back,
@@ -67,7 +86,11 @@ website, a leading `¶` is removed and other KJV markers (`[ ]`, `‹ ›`) are
 shown as-is.
 
 Returning to the app resets the date to today, and the reading scrolls back to
-the top when the day changes.
+the top when the day changes. Swipe left anywhere on the reading screen for the
+next day (the right-arrow action), or right for the previous day (the left-arrow
+action), like turning pages. Each completed horizontal swipe moves
+one day; short or canceled drags do not change the date. Vertical swipes still
+scroll the reading, and the date buttons and calendar remain available.
 
 ## Requirements
 
@@ -118,9 +141,10 @@ Jetpack Compose split (the web app's equivalent is TS logic, JSX, and CSS):
 | `ui/components/` | Striped page background shared by the curtain and the reading page |
 | `ui/main/` | `MainScreen` and the curtain-raise animation (`MainScreenStyle.kt` holds its timing and shadow) |
 | `ui/curtain/` | `CurtainScreen` (layout) and `CurtainStyle.kt` (sizes and text styles per window size) |
-| `ui/datenav/` | `DateNav` (layout), `DateNavStyle.kt`, and `CalendarMonth.kt` (calendar grid, date selection, and the saveable `DatePickerState`) |
+| `ui/datenav/` | `DateNav` (date controls and Material date picker), `DateNavStyle.kt`, and `DateSelection.kt` (UTC date conversion and date labels) |
 | `ui/dailyreading/` | Daily reading ViewModel, layout, and style (see above) |
 | `ui/scripture/` | Scripture popup state, `ScriptureDialog` (layout), and `ScriptureDialogStyle.kt` |
+| `ui/share/` | Floating share/info buttons, copyright dialog, and their styles |
 
 ### Dependency injection (Hilt)
 

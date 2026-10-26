@@ -15,7 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,33 +25,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.shannonsumner.namesofjesus.R
 import com.shannonsumner.namesofjesus.ui.theme.WonderfulNamesTheme
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.TextStyle
+import java.time.temporal.WeekFields
+import java.util.Locale
 
 private enum class DateNavDirection { Previous, Next }
 
-/** Date controls and a month/day picker, styled to match the companion web app. */
+/** Date controls with a Material-styled calendar and a year-free reading label. */
 @Composable
 internal fun DateNav(
     date: LocalDate,
     onDateChange: (LocalDate) -> Unit,
     isCompact: Boolean,
-    modifier: Modifier = Modifier,
-    today: LocalDate = LocalDate.now(),
-    pickerState: DatePickerState = rememberDatePickerState(date)
+    modifier: Modifier = Modifier
 ) {
+    val pickerState = rememberDatePickerState(date)
+    if (pickerState.isOpen) {
+        ReadingDatePicker(
+            date = date,
+            pickerState = pickerState,
+            onDateChange = onDateChange
+        )
+    }
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -71,19 +82,7 @@ internal fun DateNav(
                 showLabel = !isCompact,
                 onClick = { onDateChange(date.minusDays(1)) }
             )
-            Box {
-                DateButton(date = date, onClick = { pickerState.toggle(date) })
-                if (pickerState.isOpen) {
-                    CalendarPopup(
-                        calendar = calendarMonth(pickerState.viewMonth, date, today),
-                        isCompact = isCompact,
-                        onPreviousMonth = pickerState::showPreviousMonth,
-                        onNextMonth = pickerState::showNextMonth,
-                        onSelectDay = { day -> onDateChange(pickerState.select(date, day)) },
-                        onDismiss = pickerState::close
-                    )
-                }
-            }
+            DateButton(date = date, onClick = { pickerState.toggle(date) })
             DateNavAction(
                 direction = DateNavDirection.Next,
                 showLabel = !isCompact,
@@ -177,74 +176,89 @@ private fun DateNavAction(direction: DateNavDirection, showLabel: Boolean, onCli
 }
 
 @Composable
-private fun CalendarPopup(
-    calendar: CalendarMonth,
-    isCompact: Boolean,
-    onPreviousMonth: () -> Unit,
-    onNextMonth: () -> Unit,
-    onSelectDay: (Int) -> Unit,
-    onDismiss: () -> Unit
+private fun ReadingDatePicker(
+    date: LocalDate,
+    pickerState: DatePickerState,
+    onDateChange: (LocalDate) -> Unit
 ) {
-    val popupOffset = with(LocalDensity.current) {
-        IntOffset(
-            x = if (isCompact) 0 else DateNavStyle.PopupOffsetX.roundToPx(),
-            y = DateNavStyle.PopupOffsetY.roundToPx()
-        )
-    }
-    val chooseMonthAndDayLabel = stringResource(R.string.date_nav_choose_month_and_day)
-    val viewedMonthName = monthName(calendar.month)
-
-    Popup(
-        alignment = if (isCompact) Alignment.TopCenter else Alignment.TopEnd,
-        offset = popupOffset,
-        onDismissRequest = onDismiss,
-        properties = PopupProperties(
-            focusable = true,
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
-    ) {
+    val locale = LocalConfiguration.current.locales[0]
+    Dialog(onDismissRequest = pickerState::close) {
         Surface(
-            color = DateNavStyle.PopupColor,
-            shape = DateNavStyle.PopupShape,
-            shadowElevation = DateNavStyle.PopupElevation,
             modifier = Modifier
-                .width(DateNavStyle.PopupWidth)
-                .semantics { contentDescription = chooseMonthAndDayLabel }
+                .fillMaxWidth()
+                .widthIn(max = 360.dp),
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp
         ) {
-            Column(modifier = Modifier.padding(DateNavStyle.PopupPadding)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = DateNavStyle.MonthHeaderBottomPadding),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+            Column {
+                Column(
+                    modifier = Modifier.padding(
+                        start = 20.dp,
+                        end = 20.dp,
+                        top = 20.dp,
+                        bottom = 20.dp
+                    )
                 ) {
-                    MonthControl("‹", stringResource(R.string.date_nav_previous_month), onPreviousMonth)
-                    Text(text = viewedMonthName, style = DateNavStyle.MonthName)
-                    MonthControl("›", stringResource(R.string.date_nav_next_month), onNextMonth)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(DateNavStyle.GridSpacing)) {
-                    stringArrayResource(R.array.date_nav_weekday_labels).forEach { label ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = label,
-                            style = DateNavStyle.Weekday,
-                            modifier = Modifier.weight(1f)
+                            text = pickerState.viewMonth.month.getDisplayName(TextStyle.FULL, locale),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.sp
                         )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            MonthControl(
+                                symbol = "‹",
+                                description = stringResource(R.string.date_nav_previous_month),
+                                onClick = pickerState::showPreviousMonth
+                            )
+                            MonthControl(
+                                symbol = "›",
+                                description = stringResource(R.string.date_nav_next_month),
+                                onClick = pickerState::showNextMonth
+                            )
+                        }
                     }
-                }
-                Column(verticalArrangement = Arrangement.spacedBy(DateNavStyle.GridSpacing)) {
-                    calendar.weeks.forEach { week ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(DateNavStyle.GridSpacing)) {
-                            week.forEach { day ->
-                                if (day != null) {
-                                    CalendarDayCell(
-                                        day = day,
-                                        monthName = viewedMonthName,
-                                        onClick = { onSelectDay(day.day) }
-                                    )
-                                } else {
-                                    Spacer(modifier = Modifier.weight(1f).aspectRatio(1f))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        val firstDay = WeekFields.of(locale).firstDayOfWeek
+                        (0 until 7).forEach { offset ->
+                            val day = firstDay.plus(offset.toLong())
+                            Text(
+                                text = day.getDisplayName(TextStyle.NARROW, locale),
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        val calendar = calendarMonth(
+                            pickerState.viewMonth,
+                            date,
+                            LocalDate.now(),
+                            WeekFields.of(locale).firstDayOfWeek
+                        )
+                        calendar.weeks.forEach { week ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                week.forEach { day ->
+                                    if (day == null) {
+                                        Spacer(modifier = Modifier.weight(1f).aspectRatio(1f))
+                                    } else {
+                                        CalendarDayCell(day, pickerState.viewMonth, locale) {
+                                            onDateChange(pickerState.select(date, day.day))
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -262,19 +276,27 @@ private fun MonthControl(symbol: String, description: String, onClick: () -> Uni
             .clip(DateNavStyle.ControlShape)
             .clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = description }
-            .padding(
-                horizontal = DateNavStyle.MonthControlHorizontalPadding,
-                vertical = DateNavStyle.MonthControlVerticalPadding
-            ),
+            .size(48.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = symbol, style = DateNavStyle.MonthControl)
+        Text(
+            text = symbol,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 30.sp,
+            lineHeight = 32.sp
+        )
     }
 }
 
 @Composable
-private fun RowScope.CalendarDayCell(day: CalendarDay, monthName: String, onClick: () -> Unit) {
-    val shape = DateNavStyle.DayShape
+private fun RowScope.CalendarDayCell(
+    day: CalendarDay,
+    month: YearMonth,
+    locale: Locale,
+    onClick: () -> Unit
+) {
+    val shape = MaterialTheme.shapes.extraLarge
+    val monthName = month.month.getDisplayName(TextStyle.FULL, locale)
     val dayDescription = stringResource(R.string.date_nav_day_description, monthName, day.day)
     Box(
         modifier = Modifier
@@ -282,12 +304,12 @@ private fun RowScope.CalendarDayCell(day: CalendarDay, monthName: String, onClic
             .aspectRatio(1f)
             .clip(shape)
             .then(
-                if (day.isSelected) Modifier.background(DateNavStyle.SelectedDayColor)
+                if (day.isSelected) Modifier.background(MaterialTheme.colorScheme.primary)
                 else Modifier
             )
             .then(
-                if (day.isToday) {
-                    Modifier.border(DateNavStyle.TodayBorderWidth, DateNavStyle.TodayBorderColor, shape)
+                if (day.isToday && !day.isSelected) {
+                    Modifier.border(1.dp, MaterialTheme.colorScheme.primary, shape)
                 } else {
                     Modifier
                 }
@@ -296,7 +318,12 @@ private fun RowScope.CalendarDayCell(day: CalendarDay, monthName: String, onClic
             .semantics { contentDescription = dayDescription },
         contentAlignment = Alignment.Center
     ) {
-        Text(text = day.day.toString(), style = DateNavStyle.Day)
+        Text(
+            text = day.day.toString(),
+            color = if (day.isSelected) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onSurface,
+            fontSize = 16.sp
+        )
     }
 }
 
@@ -308,8 +335,7 @@ private fun DateNavPreview() {
         DateNav(
             date = LocalDate.of(2024, 2, 29),
             onDateChange = {},
-            isCompact = false,
-            today = LocalDate.of(2024, 2, 29)
+            isCompact = false
         )
     }
 }

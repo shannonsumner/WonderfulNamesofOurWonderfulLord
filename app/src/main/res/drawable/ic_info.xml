@@ -1,0 +1,19 @@
+<!-- Circled "i", matching the website's copyright info icon. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M3,12a9,9 0,1 0,18 0a9,9 0,1 0,-18 0"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.8" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M11,8a1,1 0,1 0,2 0a1,1 0,1 0,-2 0" />
+    <path
+        android:pathData="M12,11v6"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.8" />
+</vector>

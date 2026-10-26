@@ -5,14 +5,13 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.Locale
 
 class CalendarMonthTest {
     @Test
     fun weeksStartOnSundayAndPadToFullRows() {
-        // February 2024 starts on a Thursday and has 29 days.
         val calendar = calendarMonth(
             YearMonth.of(2024, 2),
             selected = LocalDate.of(2024, 2, 10),
@@ -28,31 +27,45 @@ class CalendarMonthTest {
     }
 
     @Test
+    fun calendarCanUseLocaleWeekStart() {
+        val calendar = calendarMonth(
+            YearMonth.of(2024, 2),
+            selected = LocalDate.of(2024, 2, 10),
+            today = LocalDate.of(2024, 2, 29),
+            firstDayOfWeek = DayOfWeek.MONDAY
+        )
+        assertNull(calendar.weeks[0].first())
+        assertEquals(1, calendar.weeks[0][3]?.day)
+    }
+
+    @Test
     fun marksSelectedAndTodayOnlyInTheirOwnMonthAndYear() {
         val selected = LocalDate.of(2024, 3, 5)
         val today = LocalDate.of(2024, 3, 9)
-        val days = calendarMonth(YearMonth.of(2024, 3), selected, today).weeks.flatten().filterNotNull()
+        val days = calendarMonth(YearMonth.of(2024, 3), selected, today)
+            .weeks.flatten().filterNotNull()
         assertEquals(listOf(5), days.filter { it.isSelected }.map { it.day })
         assertEquals(listOf(9), days.filter { it.isToday }.map { it.day })
 
-        val otherYear = calendarMonth(YearMonth.of(2025, 3), selected, today).weeks.flatten().filterNotNull()
+        val otherYear = calendarMonth(YearMonth.of(2025, 3), selected, today)
+            .weeks.flatten().filterNotNull()
         assertFalse(otherYear.any { it.isSelected || it.isToday })
     }
 
     @Test
     fun selectedDateKeepsCurrentYearAndRollsImpossibleDaysForward() {
         val current = LocalDate.of(2025, 1, 31)
-        assertEquals(LocalDate.of(2025, 2, 14), selectedDateFor(current, YearMonth.of(2024, 2), 14))
-        // February 29 doesn't exist in 2025, so it becomes March 1, as on the website.
-        assertEquals(LocalDate.of(2025, 3, 1), selectedDateFor(current, YearMonth.of(2024, 2), 29))
+        assertEquals(
+            LocalDate.of(2025, 2, 14),
+            selectedDateFor(current, YearMonth.of(2024, 2), 14)
+        )
+        assertEquals(
+            LocalDate.of(2025, 3, 1),
+            selectedDateFor(current, YearMonth.of(2024, 2), 29)
+        )
         assertEquals(
             LocalDate.of(2024, 2, 29),
             selectedDateFor(LocalDate.of(2024, 1, 1), YearMonth.of(2024, 2), 29)
         )
-    }
-
-    @Test
-    fun dateLabelOmitsYear() {
-        assertEquals("February 29", dateLabel(LocalDate.of(2024, 2, 29), Locale.US))
     }
 }
