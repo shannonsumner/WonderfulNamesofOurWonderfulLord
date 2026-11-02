@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import org.json.JSONArray
 
-@Database(entities = [DailyDevotional::class], version = 1, exportSchema = true)
+@Database(entities = [DailyDevotional::class], version = 1, exportSchema = false)
 abstract class DevotionalDatabase : RoomDatabase() {
     abstract fun dailyDevotionalDao(): DailyDevotionalDao
 

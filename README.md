@@ -194,22 +194,18 @@ Tests can build their own copy with `Room.inMemoryDatabaseBuilder` and
 
 The JSON was exported from the companion site's `data/daily-devotional.sqlite`
 without modifying the original. All row values are unchanged. Room owns the
-version-1 schema, including the non-null `day_of_year` primary key, and its
-generated versioned schema is stored in `app/schemas/`. Room still uses SQLite
-internally, but no source SQLite file is shipped or opened by the app.
-
-Future schema changes require a Room version increment and a migration.
-The seed runs only when creating a database; changing the JSON alone does not
-update existing installations.
+schema, including the non-null `day_of_year` primary key. Room still uses
+SQLite internally, but no source SQLite file is shipped or opened by the app.
 
 ## KJV Bible database
 
-`KjvDatabase` is a separate version-1 Room database. On first database access,
-Room creates its tables and imports 31,102 verses from
-`app/src/main/assets/databases/kjv-verses.jsonl` (one JSON object per line)
-and all source metadata from `kjv-metadata.json`. Verses are streamed using a
-reusable insert statement inside Room's creation transaction. Import errors
-propagate and roll back creation. No source SQLite file is bundled or modified.
+`KjvDatabase` is a separate Room database. On first database access,
+Room creates its table and imports all 31,102 verses from
+`app/src/main/assets/databases/kjv-verses.jsonl` (one JSON object per line).
+Each record contains only the book, chapter, verse, and text used by the app.
+Verses are streamed using a reusable insert statement inside Room's creation
+transaction. Import errors propagate and roll back creation. No source SQLite
+file is bundled or modified.
 
 ```kotlin
 // bible is a BibleDao requested in an @Inject constructor.
@@ -218,16 +214,22 @@ val count = bible.getVerseCount()
 ```
 
 Call DAO methods from a coroutine. Book numbers are the source's 1-based IDs (1 = Genesis,
-43 = John, 66 = Revelation). Verse IDs, text (including any markup), metadata,
-and the four source verse indexes are preserved. `getVerses` returns rows in
-database order, so callers sort or reorder them as needed. The source metadata,
-including its copyright statement and usage restrictions, is stored in the
-`meta` table. The app doesn't read it, so `BibleDao` has no query for it.
-The source states that this Bible is public domain in most parts of the world,
-but under perpetual Crown copyright in the United Kingdom.
+43 = John, 66 = Revelation). The unique `(book, chapter, verse)` values form
+the table's primary key; the redundant sequential source row ID and secondary
+indexes are not stored because the primary-key index supports passage lookup.
+Scripture text, including its source markers, is preserved. `getVerses` returns
+rows in database order, so callers sort or reorder them as needed.
 
-The Room schema is exported to `app/schemas/` under the `KjvDatabase` directory.
-As with the devotional database, later schema changes need migrations, and seed
-changes alone do not update existing databases. The scripture popup reads it
-through `ScriptureRepository`. The daily reading screen opens the database when
-it starts, so the first-run import usually finishes before a passage is tapped.
+The source is the Authorized King James Version, 1769 edition, imported from
+[Bible Analyzer](http://www.bibleanalyzer.com/download.htm). Its source
+metadata states that the text is public domain in most parts of the world but
+under perpetual Crown copyright in the United Kingdom.
+
+Room requires an integer schema version in each database declaration; both
+databases use the initial value `1`. Schema export and migration history are
+disabled because this project is tested with fresh virtual-device installs.
+Clear app data on a virtual device after changing a database schema. The seed
+runs only when creating a database, so changing the JSON alone does not update
+existing installations. The scripture popup reads it through
+`ScriptureRepository`. The daily reading screen opens the database when it
+starts, so the first-run import usually finishes before a passage is tapped.

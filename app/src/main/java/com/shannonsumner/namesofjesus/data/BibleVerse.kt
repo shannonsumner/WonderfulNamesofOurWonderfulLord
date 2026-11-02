@@ -1,21 +1,9 @@
 package com.shannonsumner.namesofjesus.data
 
 import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
 
-@Entity(
-    tableName = "verses",
-    indices = [
-        Index(value = ["book"], name = "ixb"),
-        Index(value = ["chapter"], name = "ixc"),
-        Index(value = ["verse"], name = "ixv"),
-        Index(value = ["book", "chapter", "verse"], name = "ixbcv")
-    ]
-)
+@Entity(tableName = "verses", primaryKeys = ["book", "chapter", "verse"])
 data class BibleVerse(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
     val book: Int,
     val chapter: Int,
     val verse: Int,
