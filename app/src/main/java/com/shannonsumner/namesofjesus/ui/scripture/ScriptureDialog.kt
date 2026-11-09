@@ -20,7 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import com.shannonsumner.namesofjesus.R
 import com.shannonsumner.namesofjesus.data.ScriptureSelection
-import com.shannonsumner.namesofjesus.data.ScriptureVerse
+import com.shannonsumner.namesofjesus.data.Verse
 import com.shannonsumner.namesofjesus.ui.theme.WonderfulNamesTheme
 
 /** Shows a tapped passage's KJV text. Back, tapping outside, or Close calls [onDismiss]. */
@@ -76,8 +76,8 @@ private fun ScriptureDialogPreview() {
                 selection = ScriptureSelection(43, 3, "16-17", "John 3:16-17"),
                 content = PassageContent.Loaded(
                     listOf(
-                        ScriptureVerse(16, "‹For God so loved the world, that he gave his only begotten Son…›"),
-                        ScriptureVerse(17, "‹For God sent not his Son into the world to condemn the world…›")
+                        Verse(16, "‹For God so loved the world, that he gave his only begotten Son…›"),
+                        Verse(17, "‹For God sent not his Son into the world to condemn the world…›")
                     )
                 )
             ),

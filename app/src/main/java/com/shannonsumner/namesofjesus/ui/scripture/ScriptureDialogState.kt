@@ -1,12 +1,12 @@
 package com.shannonsumner.namesofjesus.ui.scripture
 
 import com.shannonsumner.namesofjesus.data.ScriptureSelection
-import com.shannonsumner.namesofjesus.data.ScriptureVerse
+import com.shannonsumner.namesofjesus.data.Verse
 
 /** What the passage popup shows while it is open. */
 sealed interface PassageContent {
     data object Loading : PassageContent
-    data class Loaded(val verses: List<ScriptureVerse>) : PassageContent
+    data class Loaded(val verses: List<Verse>) : PassageContent
     /** The reference is invalid or its verses couldn't be read. */
     data object Unavailable : PassageContent
 }

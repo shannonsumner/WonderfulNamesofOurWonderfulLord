@@ -5,7 +5,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /** One KJV verse ready to display. */
-data class ScriptureVerse(val verse: Int, val text: String)
+data class Verse(val verse: Int, val text: String)
 
 private const val MaxVerse = 176 // Psalm 119
 private const val MaxSelectionLength = 512
@@ -38,7 +38,7 @@ fun parseVerseSelection(selection: String, chapter: Int? = null): List<Int>? {
 internal fun displayVerseText(text: String): String = text.replace(Regex("""^¶\s*"""), "").trim()
 
 /** Looks up passages tapped in the devotional. */
-interface ScriptureRepository {
+interface BibleRepository {
     /** Opens the Bible, building it from the bundled source on first run. */
     suspend fun prepare()
 
@@ -46,16 +46,16 @@ interface ScriptureRepository {
      * Returns the selected verses in selection order, or null if the selection
      * is invalid or any verse is missing (the website responds 400/404 then).
      */
-    suspend fun getPassage(selection: ScriptureSelection): List<ScriptureVerse>?
+    suspend fun getPassage(selection: ScriptureSelection): List<Verse>?
 }
 
 /** Reads passages from the KJV Room database. */
-class RoomScriptureRepository @Inject constructor(private val dao: BibleDao) : ScriptureRepository {
+class RoomBibleRepository @Inject constructor(private val dao: BibleDao) : BibleRepository {
     override suspend fun prepare() {
         dao.getVerseCount()
     }
 
-    override suspend fun getPassage(selection: ScriptureSelection): List<ScriptureVerse>? {
+    override suspend fun getPassage(selection: ScriptureSelection): List<Verse>? {
         if (selection.book !in 1..BookNames.size || selection.chapter < 1) return null
         val verses = parseVerseSelection(selection.verse, selection.chapter) ?: return null
         val rows = dao.getVerses(selection.book, selection.chapter, verses)
@@ -64,7 +64,7 @@ class RoomScriptureRepository @Inject constructor(private val dao: BibleDao) : S
             if (verses.any { it !in textByVerse }) {
                 null
             } else {
-                verses.map { ScriptureVerse(it, displayVerseText(textByVerse.getValue(it))) }
+                verses.map { Verse(it, displayVerseText(textByVerse.getValue(it))) }
             }
         }
     }

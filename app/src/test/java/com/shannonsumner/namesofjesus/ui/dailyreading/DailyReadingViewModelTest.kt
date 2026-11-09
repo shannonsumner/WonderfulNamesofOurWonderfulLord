@@ -3,9 +3,9 @@ package com.shannonsumner.namesofjesus.ui.dailyreading
 import com.shannonsumner.namesofjesus.data.Devotional
 import com.shannonsumner.namesofjesus.data.DevotionalBody
 import com.shannonsumner.namesofjesus.data.DevotionalRepository
-import com.shannonsumner.namesofjesus.data.ScriptureRepository
+import com.shannonsumner.namesofjesus.data.BibleRepository
 import com.shannonsumner.namesofjesus.data.ScriptureSelection
-import com.shannonsumner.namesofjesus.data.ScriptureVerse
+import com.shannonsumner.namesofjesus.data.Verse
 import com.shannonsumner.namesofjesus.ui.scripture.PassageContent
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -43,13 +43,13 @@ class DailyReadingViewModelTest {
 
     private fun viewModel(
         loadDevotional: suspend (LocalDate) -> Devotional? = { devotional(it) },
-        loadPassage: suspend (ScriptureSelection) -> List<ScriptureVerse>? = { null },
+        loadPassage: suspend (ScriptureSelection) -> List<Verse>? = { null },
         today: () -> LocalDate = { start }
     ) = DailyReadingViewModel(
         devotionals = object : DevotionalRepository {
             override suspend fun getDevotional(date: LocalDate) = loadDevotional(date)
         },
-        scriptures = object : ScriptureRepository {
+        scriptures = object : BibleRepository {
             override suspend fun prepare() = Unit
             override suspend fun getPassage(selection: ScriptureSelection) = loadPassage(selection)
         },
@@ -128,7 +128,7 @@ class DailyReadingViewModelTest {
 
     @Test
     fun openingScriptureShowsLoadingThenTheVerses() = runTest(dispatcher) {
-        val verses = listOf(ScriptureVerse(16, "For God so loved the world"))
+        val verses = listOf(Verse(16, "For God so loved the world"))
         val viewModel = viewModel(loadPassage = { verses })
 
         viewModel.openScripture(scripture)
@@ -157,15 +157,15 @@ class DailyReadingViewModelTest {
 
     @Test
     fun aSlowEarlierPassageDoesNotReplaceTheLatestOne() = runTest(dispatcher) {
-        val slow = CompletableDeferred<List<ScriptureVerse>?>()
+        val slow = CompletableDeferred<List<Verse>?>()
         val first = ScriptureSelection(43, 1, "1", "John 1:1")
-        val latest = listOf(ScriptureVerse(16, "For God so loved the world"))
+        val latest = listOf(Verse(16, "For God so loved the world"))
         val viewModel = viewModel(loadPassage = { if (it == first) slow.await() else latest })
 
         viewModel.openScripture(first)
         advanceUntilIdle()
         viewModel.openScripture(scripture)
-        slow.complete(listOf(ScriptureVerse(1, "In the beginning")))
+        slow.complete(listOf(Verse(1, "In the beginning")))
         advanceUntilIdle()
 
         assertEquals(scripture, viewModel.uiState.value.scripture?.selection)
@@ -174,13 +174,13 @@ class DailyReadingViewModelTest {
 
     @Test
     fun closingWhileLoadingKeepsThePopupClosed() = runTest(dispatcher) {
-        val slow = CompletableDeferred<List<ScriptureVerse>?>()
+        val slow = CompletableDeferred<List<Verse>?>()
         val viewModel = viewModel(loadPassage = { slow.await() })
 
         viewModel.openScripture(scripture)
         advanceUntilIdle()
         viewModel.closeScripture()
-        slow.complete(listOf(ScriptureVerse(16, "For God so loved the world")))
+        slow.complete(listOf(Verse(16, "For God so loved the world")))
         advanceUntilIdle()
 
         assertNull(viewModel.uiState.value.scripture)

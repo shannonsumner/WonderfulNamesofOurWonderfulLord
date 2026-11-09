@@ -8,7 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.shannonsumner.namesofjesus.data.ScriptureSelection
-import com.shannonsumner.namesofjesus.data.ScriptureVerse
+import com.shannonsumner.namesofjesus.data.Verse
 import com.shannonsumner.namesofjesus.ui.theme.WonderfulNamesTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -29,7 +29,7 @@ class ScriptureDialogTest {
                     ScriptureDialogState(
                         selection,
                         PassageContent.Loaded(
-                            listOf(ScriptureVerse(16, "For God so loved"), ScriptureVerse(17, "For God sent not"))
+                            listOf(Verse(16, "For God so loved"), Verse(17, "For God sent not"))
                         )
                     ),
                     onDismiss = { dismissed++ }

@@ -8,8 +8,8 @@ import com.shannonsumner.namesofjesus.data.DevotionalDatabase
 import com.shannonsumner.namesofjesus.data.DevotionalRepository
 import com.shannonsumner.namesofjesus.data.BibleDatabase
 import com.shannonsumner.namesofjesus.data.RoomDevotionalRepository
-import com.shannonsumner.namesofjesus.data.RoomScriptureRepository
-import com.shannonsumner.namesofjesus.data.ScriptureRepository
+import com.shannonsumner.namesofjesus.data.RoomBibleRepository
+import com.shannonsumner.namesofjesus.data.BibleRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -56,5 +56,5 @@ abstract class RepositoryModule {
     abstract fun bindDevotionalRepository(repository: RoomDevotionalRepository): DevotionalRepository
 
     @Binds
-    abstract fun bindScriptureRepository(repository: RoomScriptureRepository): ScriptureRepository
+    abstract fun bindBibleRepository(repository: RoomBibleRepository): BibleRepository
 }

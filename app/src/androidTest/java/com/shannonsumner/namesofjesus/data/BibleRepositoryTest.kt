@@ -15,17 +15,17 @@ import org.junit.runner.RunWith
 import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
-class ScriptureRepositoryTest {
+class BibleRepositoryTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var bible: BibleDatabase
-    private lateinit var scriptures: ScriptureRepository
+    private lateinit var scriptures: BibleRepository
 
     @Before
     fun setUp() {
         bible = Room.inMemoryDatabaseBuilder(context, BibleDatabase::class.java)
             .addCallback(BibleDatabase.seedCallback(context))
             .build()
-        scriptures = RoomScriptureRepository(bible.bibleDao())
+        scriptures = RoomBibleRepository(bible.bibleDao())
     }
 
     @After

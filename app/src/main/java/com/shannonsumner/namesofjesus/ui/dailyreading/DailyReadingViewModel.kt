@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shannonsumner.namesofjesus.data.DevotionalRepository
 import com.shannonsumner.namesofjesus.data.Devotional
-import com.shannonsumner.namesofjesus.data.ScriptureRepository
+import com.shannonsumner.namesofjesus.data.BibleRepository
 import com.shannonsumner.namesofjesus.data.ScriptureSelection
 import com.shannonsumner.namesofjesus.ui.scripture.PassageContent
 import com.shannonsumner.namesofjesus.ui.scripture.ScriptureDialogState
@@ -37,7 +37,7 @@ data class DailyReadingUiState(
 @HiltViewModel
 class DailyReadingViewModel @Inject constructor(
     private val devotionals: DevotionalRepository,
-    private val scriptures: ScriptureRepository,
+    private val scriptures: BibleRepository,
     private val clock: Clock
 ) : ViewModel() {
     private val _uiState = currentDate().let { MutableStateFlow(DailyReadingUiState(today = it, date = it)) }
