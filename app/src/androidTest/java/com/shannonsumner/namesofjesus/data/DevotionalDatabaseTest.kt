@@ -28,7 +28,7 @@ class DevotionalDatabaseTest {
         try {
             val database = openDatabase()
             val devotionals = try {
-                val dao = database.dailyDevotionalDao()
+                val dao = database.devotionalDao()
                 val all = dao.getAll()
                 assertEquals((1..366).toList(), all.map { it.dayOfYear })
                 for (devotional in all) {
@@ -42,7 +42,7 @@ class DevotionalDatabaseTest {
             }
             val reopened = openDatabase()
             try {
-                assertEquals(devotionals, reopened.dailyDevotionalDao().getAll())
+                assertEquals(devotionals, reopened.devotionalDao().getAll())
             } finally {
                 reopened.close()
             }

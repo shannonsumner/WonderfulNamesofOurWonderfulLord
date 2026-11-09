@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "Daily")
-data class DailyDevotional(
+data class DevotionalDailyReading(
     @PrimaryKey
     @ColumnInfo(name = "day_of_year")
     val dayOfYear: Int,

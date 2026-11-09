@@ -24,7 +24,7 @@ class DevotionalRepositoryTest {
         database = Room.inMemoryDatabaseBuilder(context, DevotionalDatabase::class.java)
             .addCallback(DevotionalDatabase.seedCallback(context))
             .build()
-        repository = RoomDevotionalRepository(database.dailyDevotionalDao())
+        repository = RoomDevotionalRepository(database.devotionalDao())
     }
 
     @After
@@ -32,7 +32,7 @@ class DevotionalRepositoryTest {
 
     @Test
     fun leapDayHasItsOwnReadingAndLaterDatesMatchInEveryYear() = runBlocking {
-        val dao = database.dailyDevotionalDao()
+        val dao = database.devotionalDao()
         val leapDay = repository.getDevotional(LocalDate.of(2024, 2, 29))
         assertEquals(dao.getByDayOfYear(60)!!.topic, leapDay?.topic)
 

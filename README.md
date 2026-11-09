@@ -172,7 +172,7 @@ sync with `CurtainGreen`.
 ## Devotional database
 
 The app bundles all 366 devotionals as data in
-`app/src/main/assets/databases/daily-devotionals.json`, not as a SQLite database.
+`app/src/main/assets/databases/devotional.json`, not as a SQLite database.
 Room creates a new database in the app's private database directory on first use
 and imports the JSON in its database-creation transaction. If importing fails,
 creation rolls back and the error propagates rather than leaving a partial database.
@@ -180,7 +180,7 @@ Hilt provides one database instance for the app. To use the DAO, ask for it in
 an `@Inject` constructor:
 
 ```kotlin
-class MyRepository @Inject constructor(private val dao: DailyDevotionalDao) {
+class MyRepository @Inject constructor(private val dao: DevotionalDao) {
     suspend fun firstDay() = dao.getByDayOfYear(1) // Days are 1 through 366.
 }
 ```
@@ -199,9 +199,9 @@ SQLite internally, but no source SQLite file is shipped or opened by the app.
 
 ## KJV Bible database
 
-`KjvDatabase` is a separate Room database. On first database access,
+`BibleDatabase` is a separate Room database. On first database access,
 Room creates its table and imports all 31,102 verses from
-`app/src/main/assets/databases/kjv-verses.jsonl` (one JSON object per line).
+`app/src/main/assets/databases/bible.json` (one JSON object per line).
 Each record contains only the book, chapter, verse, and text used by the app.
 Verses are streamed using a reusable insert statement inside Room's creation
 transaction. Import errors propagate and roll back creation. No source SQLite

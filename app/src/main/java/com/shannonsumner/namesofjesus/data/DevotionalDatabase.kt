@@ -6,17 +6,17 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import org.json.JSONArray
 
-@Database(entities = [DailyDevotional::class], version = 1, exportSchema = false)
+@Database(entities = [DevotionalDailyReading::class], version = 1, exportSchema = false)
 abstract class DevotionalDatabase : RoomDatabase() {
-    abstract fun dailyDevotionalDao(): DailyDevotionalDao
+    abstract fun devotionalDao(): DevotionalDao
 
     companion object {
         /** The database file name in the app's private storage. */
-        const val FILE_NAME = "daily-devotional.sqlite"
+        const val FILE_NAME = "devotional.sqlite"
 
         internal fun seedCallback(context: Context): Callback = object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
-                val devotionals = context.assets.open("databases/daily-devotionals.json")
+                val devotionals = context.assets.open("databases/devotional.json")
                     .bufferedReader(Charsets.UTF_8)
                     .use { JSONArray(it.readText()) }
 

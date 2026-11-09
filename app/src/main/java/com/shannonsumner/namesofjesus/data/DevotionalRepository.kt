@@ -29,7 +29,7 @@ interface DevotionalRepository {
 
 /** Reads devotionals from Room and converts their HTML for display. */
 class RoomDevotionalRepository @Inject constructor(
-    private val dao: DailyDevotionalDao
+    private val dao: DevotionalDao
 ) : DevotionalRepository {
     override suspend fun getDevotional(date: LocalDate): Devotional? =
         dao.getByDayOfYear(devotionalDayOfYear(date))?.let { row ->
@@ -37,7 +37,7 @@ class RoomDevotionalRepository @Inject constructor(
         }
 }
 
-internal fun DailyDevotional.toDevotional(): Devotional = Devotional(
+internal fun DevotionalDailyReading.toDevotional(): Devotional = Devotional(
     topic = DevotionalHtml.decodeEntities(topic),
     scripture = DevotionalHtml.decodeEntities(scripture),
     reference = reference,

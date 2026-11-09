@@ -11,12 +11,12 @@ import org.json.JSONObject
     version = 1,
     exportSchema = false
 )
-abstract class KjvDatabase : RoomDatabase() {
+abstract class BibleDatabase : RoomDatabase() {
     abstract fun bibleDao(): BibleDao
 
     companion object {
         /** The database file name in the app's private storage. */
-        const val FILE_NAME = "kjv.sqlite"
+        const val FILE_NAME = "bible.sqlite"
 
         internal fun seedCallback(context: Context): Callback = object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
@@ -25,7 +25,7 @@ abstract class KjvDatabase : RoomDatabase() {
                 db.compileStatement(
                     "INSERT INTO verses (book, chapter, verse, text) VALUES (?, ?, ?, ?)"
                 ).use { statement ->
-                    context.assets.open("databases/kjv-verses.jsonl")
+                    context.assets.open("databases/bible.json")
                         .bufferedReader(Charsets.UTF_8)
                         .useLines { lines ->
                             lines.forEach { line ->

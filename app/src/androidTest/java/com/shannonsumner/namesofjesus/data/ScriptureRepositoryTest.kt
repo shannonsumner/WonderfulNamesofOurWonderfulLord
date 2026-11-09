@@ -17,13 +17,13 @@ import java.time.LocalDate
 @RunWith(AndroidJUnit4::class)
 class ScriptureRepositoryTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private lateinit var bible: KjvDatabase
+    private lateinit var bible: BibleDatabase
     private lateinit var scriptures: ScriptureRepository
 
     @Before
     fun setUp() {
-        bible = Room.inMemoryDatabaseBuilder(context, KjvDatabase::class.java)
-            .addCallback(KjvDatabase.seedCallback(context))
+        bible = Room.inMemoryDatabaseBuilder(context, BibleDatabase::class.java)
+            .addCallback(BibleDatabase.seedCallback(context))
             .build()
         scriptures = RoomScriptureRepository(bible.bibleDao())
     }
@@ -51,7 +51,7 @@ class ScriptureRepositoryTest {
             .addCallback(DevotionalDatabase.seedCallback(context))
             .build()
         try {
-            val devotionals = RoomDevotionalRepository(database.dailyDevotionalDao())
+            val devotionals = RoomDevotionalRepository(database.devotionalDao())
             for (dayOfYear in 1..366) {
                 val devotional = requireNotNull(devotionals.getDevotional(LocalDate.ofYearDay(2024, dayOfYear)))
                 val selections = listOfNotNull(devotional.mainScripture) +

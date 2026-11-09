@@ -11,15 +11,15 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class KjvDatabaseTest {
+class BibleDatabaseTest {
     @Test
     fun roomImportsSourceDataAndPreservesItWhenReopened() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val name = "kjv-test.sqlite"
         context.deleteDatabase(name)
 
-        fun openDatabase() = Room.databaseBuilder(context, KjvDatabase::class.java, name)
-            .addCallback(KjvDatabase.seedCallback(context))
+        fun openDatabase() = Room.databaseBuilder(context, BibleDatabase::class.java, name)
+            .addCallback(BibleDatabase.seedCallback(context))
             .build()
 
         try {
@@ -27,7 +27,7 @@ class KjvDatabaseTest {
             try {
                 val dao = database.bibleDao()
                 assertEquals(31102, dao.getVerseCount())
-                val expectedByChapter = context.assets.open("databases/kjv-verses.jsonl")
+                val expectedByChapter = context.assets.open("databases/bible.json")
                     .bufferedReader(Charsets.UTF_8)
                     .useLines { lines ->
                         lines.map { line ->

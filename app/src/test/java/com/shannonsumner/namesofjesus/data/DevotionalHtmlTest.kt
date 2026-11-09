@@ -131,7 +131,7 @@ class DevotionalHtmlTest {
 
     @Test
     fun mapsDatabaseRowsForDisplay() {
-        val row = DailyDevotional(
+        val row = DevotionalDailyReading(
             dayOfYear = 60,
             topic = "A Branch",
             scripture = "And&hellip; a Branch",

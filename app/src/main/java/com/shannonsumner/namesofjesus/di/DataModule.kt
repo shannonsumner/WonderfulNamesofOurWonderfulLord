@@ -3,10 +3,10 @@ package com.shannonsumner.namesofjesus.di
 import android.content.Context
 import androidx.room.Room
 import com.shannonsumner.namesofjesus.data.BibleDao
-import com.shannonsumner.namesofjesus.data.DailyDevotionalDao
+import com.shannonsumner.namesofjesus.data.DevotionalDao
 import com.shannonsumner.namesofjesus.data.DevotionalDatabase
 import com.shannonsumner.namesofjesus.data.DevotionalRepository
-import com.shannonsumner.namesofjesus.data.KjvDatabase
+import com.shannonsumner.namesofjesus.data.BibleDatabase
 import com.shannonsumner.namesofjesus.data.RoomDevotionalRepository
 import com.shannonsumner.namesofjesus.data.RoomScriptureRepository
 import com.shannonsumner.namesofjesus.data.ScriptureRepository
@@ -32,17 +32,17 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideKjvDatabase(@ApplicationContext context: Context): KjvDatabase =
-        Room.databaseBuilder(context, KjvDatabase::class.java, KjvDatabase.FILE_NAME)
-            .addCallback(KjvDatabase.seedCallback(context))
+    fun provideBibleDatabase(@ApplicationContext context: Context): BibleDatabase =
+        Room.databaseBuilder(context, BibleDatabase::class.java, BibleDatabase.FILE_NAME)
+            .addCallback(BibleDatabase.seedCallback(context))
             .build()
 
     @Provides
-    fun provideDailyDevotionalDao(database: DevotionalDatabase): DailyDevotionalDao =
-        database.dailyDevotionalDao()
+    fun provideDevotionalDao(database: DevotionalDatabase): DevotionalDao =
+        database.devotionalDao()
 
     @Provides
-    fun provideBibleDao(database: KjvDatabase): BibleDao = database.bibleDao()
+    fun provideBibleDao(database: BibleDatabase): BibleDao = database.bibleDao()
 
     /** The device clock in its current time zone; tests can supply a fixed clock instead. */
     @Provides
